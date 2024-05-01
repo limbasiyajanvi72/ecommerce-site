@@ -1,0 +1,15 @@
+export const filterSliceState = {
+	filterCompanyData: [],
+	filterCategoryData: [],
+	filterColorData: [],
+	filterPriceRange: [],
+	isCompanyCheck: false,
+	checkedCompany: [],
+	checkedColor: [],
+	isColorCheck: false,
+	checkedCategory: [],
+	isCategoryCheck: false,
+	isFreeDeliveryAvailable: false,
+	maxPrice: [],
+	isPriceRangeSet: false,
+};

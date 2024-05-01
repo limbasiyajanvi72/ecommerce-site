@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+   margin: 0px;
+   padding: 0px;
+   box-sizing: border-box;
+}
+
+body {
+   max-width: 2500px;
+   margin: auto;
+}
+
+.slick-dots li button::before {
+   content: "" !important;
+   font-size: 5px !important;
+   color: rgb(51 65 85);
+   border: 1px solid rgb(51 65 85);
+   border-radius: 50%;
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   background-color: rgb(51 65 85);
+   height: 12px !important;
+   width: 12px !important;
+   margin-top: 6px;
+}
+
+.slick-dots li.slick-active button:before {
+   content: "";
+   color: rgb(30 41 59);
+   border: 1px solid rgb(30 41 59);
+   background-color: rgb(30 41 59);
+}
+
+.product-wrapper {
+   position: absolute;
+   inset: 0;
+   background-image: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0) 50%);
+   border-radius: 24px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+.underline-logo {
+   position: relative;
+}
+
+.underline-logo::after {
+   content: "";
+   position: absolute;
+   width: 100%;
+   border-top: solid 3px rgb(107 114 128);
+   left: 0;
+   bottom: 3px;
+   border-radius: 50%;
+   height: 12px;
+}
+
+.count {
+   position: relative;
+   top: 0;
+   right: -10px;
+   z-index: 2;
+   font-size: 11px;
+   border-radius: 50%;
+   background: #d60b28;
+   width: 14px;
+   height: 14px;
+   line-height: 14px;
+   display: block;
+   text-align: center;
+   color: white;
+   font-family: 'Roboto', sans-serif;
+   font-weight: normal;
+}
+
+.cart {
+   z-index: 1;
+   position: relative;
+   top: -3px;
+   overflow: hidden;
+}
+
+.logo-style {
+   background: linear-gradient(to right, rgb(156 163 175), rgb(107 114 128),
+         rgb(75 85 99), rgb(156 163 175));
+   -webkit-text-fill-color: transparent;
+   -webkit-background-clip: text;
+}
+
+.shadow-color {
+   -webkit-box-shadow: 0px 0px 24px 5px rgba(79, 70, 229, 0.25);
+   -moz-box-shadow: 0px 0px 24px 5px rgba(79, 70, 229, 0.25);
+   box-shadow: 0px 0px 24px 5px rgba(79, 70, 229, 0.25);
+}
+
+.toastify-style {
+   --toastify-color-light: linear-gradient(45deg, #0F172A, #1E293B, #334155);
+   --toastify-text-color-light: #CBD5E1;
+   --toastify-color-progress-light: linear-gradient(to right, #3730A3, #4338CA, #6366F2);
+}
+
+.Toastify__close-button--light > svg {
+   color: white
+}
+
+.pro-category-style::-webkit-scrollbar {
+   width: 20px;
+}
+
+.pro-category-style::-webkit-scrollbar-track {
+   background-color: transparent;
+}
+
+.pro-category-style::-webkit-scrollbar-thumb {
+   background-color: rgb(226 232 240);
+   border-radius: 20px;
+   border: 6px solid transparent;
+   background-clip: content-box;
+}
+
+.pro-category-style::-webkit-scrollbar-thumb:hover {
+   background-color: rgb(203 213 225);
+}
+
+::-webkit-calendar-picker-indicator {
+   filter: invert(1);
+}
+
+.item-selected {
+   background-color: rgb(203 213 225);
+   cursor: default;
+}
+
+.inner-shadow {
+   box-shadow: inset rgb(148 163 184) 0px 0px 3px 2px;
+}
