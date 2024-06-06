@@ -30,6 +30,12 @@ function ProductList({ updateCartCount }) {
 	} = useSelector((state) => state.filter);
 	const { searchItems } = useSelector((state) => state.search);
 	const [currentPage, setCurrentPage] = useState(1);
+	const [updatedIndex, setUpdatedIndex] = useState({
+		minIndex: 0,
+		maxIndex: 9,
+	});
+
+	useEffect(() => {}, [currentPage]);
 
 	const fetchData = async () => {
 		const db = getDatabase(app);
@@ -283,109 +289,70 @@ function ProductList({ updateCartCount }) {
 	function toggleSidebar() {
 		dispatch(filterSliceActions.setIsOpenFilter(true));
 	}
-	const setPage = (e) => {
-		let value = e.target.value;
-	};
 
-	// return (
-	// 	<div>
-	// 		<ToastContainer />
-	// 		<div className='flex flex-wrap gap-x-10 gap-y-28 justify-center items-center my-24  flex-none'>
-	// 			{filterData &&
-	// 				filterData.map((item, index) => (
-	// 					<div key={item.id} className='relative w-96 group'>
-	// 						<img
-	// 							src={item.image}
-	// 							alt={item.name}
-	// 							className='h-72 min-w-[384px] object-cover rounded-3xl shadow-lg z-20 opacity-90 cursor-pointer transition-transform duration-300 transform group-hover:-translate-y-12 '
-	// 							onClick={(e) =>
-	// 								showProductDetails(item, index, e)
-	// 							}
-	// 						/>
+	useEffect(() => {
+		switch (currentPage) {
+			case 1:
+				setUpdatedIndex({ ...updatedIndex, minIndex: 0, maxIndex: 9 });
+				break;
+			case 2:
+				setUpdatedIndex({
+					...updatedIndex,
+					minIndex: 10,
+					maxIndex: 19,
+				});
+				break;
+			case 3:
+				setUpdatedIndex({
+					...updatedIndex,
+					minIndex: 20,
+					maxIndex: 29,
+				});
+				break;
+			case 4:
+				setUpdatedIndex({
+					...updatedIndex,
+					minIndex: 30,
+					maxIndex: 39,
+				});
+				break;
 
-	// 						<button
-	// 							onClick={openWhatsApp}
-	// 							className='absolute top-5 right-5 z-10 bg-white rounded p-1 shadow h-6 w-6  text-slate-500 '
-	// 						>
-	// 							<SiWhatsapp />
-	// 						</button>
+			default:
+				return;
+		}
+	}, [currentPage, updatedIndex]);
+	// const setData = () => {
+	// 	switch (currentPage) {
+	// 		case 1:
+	// 			setUpdatedIndex({ ...updatedIndex, minIndex: 0, maxIndex: 9 });
+	// 			break;
+	// 		case 2:
+	// 			setUpdatedIndex({
+	// 				...updatedIndex,
+	// 				minIndex: 10,
+	// 				maxIndex: 19,
+	// 			});
+	// 			break;
+	// 		case 3:
+	// 			setUpdatedIndex({
+	// 				...updatedIndex,
+	// 				minIndex: 20,
+	// 				maxIndex: 29,
+	// 			});
+	// 			break;
+	// 		case 4:
+	// 			setUpdatedIndex({
+	// 				...updatedIndex,
+	// 				minIndex: 30,
+	// 				maxIndex: 39,
+	// 			});
+	// 			break;
 
-	// 						<div className='mx-5 p-3 flex flex-col absolute bottom-12 left-0 right-0 z-10 capitalize'>
-	// 							<span className='font-bold text-white'>
-	// 								{item.name}
-	// 							</span>
-	// 							<div className='flex justify-between'>
-	// 								<span className='font-medium text-base text-white'>
-	// 									{item.company}
-	// 								</span>
-	// 								<button
-	// 									className='bg-slate-800 rounded-md text-white p-1 shadow-xl text-sm'
-	// 									onClick={(e) =>
-	// 										handleAddCart(e, item, index)
-	// 									}
-	// 								>
-	// 									{countButton.includes(index) ? (
-	// 										<div>Go to cart</div>
-	// 									) : (
-	// 										<div>Add to cart</div>
-	// 									)}
-	// 								</button>
-	// 							</div>
-	// 						</div>
+	// 		default:
+	// 			return;
+	// 	}
+	// };
 
-	// 						<div className='absolute -bottom-12 text-lg xl:text-lg bg-slate-100 mx-5 p-3 text-slate-500 capitalize z-30 rounded-3xl shadow-xl flex flex-col gap-1'>
-	// 							<div className=' flex justify-between '>
-	// 								<div className='flex flex-col gap-1'>
-	// 									<div className='text-sm '>
-	// 										{item.description
-	// 											.substring(0, 60)
-	// 											.trim()}
-	// 										...
-	// 									</div>
-	// 								</div>
-	// 								<div>
-	// 									<div className='text-slate-800 text-base text-end'>
-	// 										₹{item.price}
-	// 									</div>
-	// 									<div className='flex text-slate-500 text-xs capitalize flex-nowrap '>
-	// 										<span>M.R.P.:</span>
-	// 										<span className='line-through'>
-	// 											₹{item.price + 1000}
-	// 										</span>
-	// 									</div>
-	// 								</div>
-	// 							</div>
-	// 							<div className='flex gap-[10px] h-auto flex-wrap'>
-	// 								{item.category &&
-	// 									item.category.map((category, index) => {
-	// 										return (
-	// 											index <= 2 && (
-	// 												<div
-	// 													className='text-xs bg-gray-200 max-w-max rounded p-[2px] font-medium text-slate-600 '
-	// 													key={index}
-	// 												>
-	// 													{category}
-	// 												</div>
-	// 											)
-	// 										);
-	// 									})}
-	// 								<div
-	// 									className='text-xs font-medium cursor-pointer'
-	// 									onClick={(e) =>
-	// 										showProductDetails(item, index, e)
-	// 									}
-	// 								>
-	// 									show more...
-	// 								</div>
-	// 							</div>
-	// 						</div>
-
-	// 						<div className='product-wrapper transition-transform duration-300 transform group-hover:-translate-y-12 pointer-events-none'></div>
-	// 					</div>
-	// 				))}
-	// 		</div>
-	// 	</div>
-	// );
 	const skeletonsArray = Array.from({ length: 6 }, (index) => index);
 
 	return (
@@ -414,94 +381,18 @@ function ProductList({ updateCartCount }) {
 					</button>
 					<div className='flex flex-wrap gap-x-10 gap-y-28 justify-center items-center my-24  flex-none'>
 						{filterData &&
-							filterData.map((item, index) => (
-								<div
-									key={item.id}
-									className='relative w-96 group'
-								>
-									<img
-										src={item.image}
-										alt={item.name}
-										className='h-72 min-w-[384px] object-cover rounded-3xl shadow-lg z-20 opacity-90 cursor-pointer transition-transform duration-300 transform group-hover:-translate-y-12 '
-										onClick={(e) =>
-											showProductDetails(item, index, e)
-										}
-									/>
-
-									<button
-										onClick={openWhatsApp}
-										className='absolute top-5 right-5 z-10 bg-white rounded p-1 shadow h-6 w-6  text-slate-500 '
-									>
-										<SiWhatsapp />
-									</button>
-
-									<div className='mx-5 p-3 flex flex-col absolute bottom-12 left-0 right-0 z-10 capitalize'>
-										<span className='font-bold text-white'>
-											{item.name}
-										</span>
-										<div className='flex justify-between'>
-											<span className='font-medium text-base text-white'>
-												{item.company}
-											</span>
-											<button
-												className='bg-slate-800 rounded-md text-white p-1 shadow-xl text-sm'
-												onClick={(e) =>
-													handleAddCart(
-														e,
-														item,
-														index
-													)
-												}
-											>
-												{countButton.includes(index) ? (
-													<div>Go to cart</div>
-												) : (
-													<div>Add to cart</div>
-												)}
-											</button>
-										</div>
-									</div>
-
-									<div className='absolute -bottom-12 text-lg xl:text-lg bg-slate-100 mx-5 p-3 text-slate-500 capitalize z-30 rounded-3xl shadow-xl flex flex-col gap-1'>
-										<div className=' flex justify-between '>
-											<div className='flex flex-col gap-1'>
-												<div className='text-sm '>
-													{item.description
-														.substring(0, 60)
-														.trim()}
-													...
-												</div>
-											</div>
-											<div>
-												<div className='text-slate-800 text-base text-end'>
-													₹{item.price}
-												</div>
-												<div className='flex text-slate-500 text-xs capitalize flex-nowrap '>
-													<span>M.R.P.:</span>
-													<span className='line-through'>
-														₹{item.price + 1000}
-													</span>
-												</div>
-											</div>
-										</div>
-										<div className='flex gap-[10px] h-auto flex-wrap'>
-											{item.category &&
-												item.category.map(
-													(category, index) => {
-														return (
-															index <= 2 && (
-																<div
-																	className='text-xs bg-gray-200 max-w-max rounded p-[2px] font-medium text-slate-600 '
-																	key={index}
-																>
-																	{category}
-																</div>
-															)
-														);
-													}
-												)}
-											<div
-												className='text-xs font-medium cursor-pointer'
+							filterData.map(
+								(item, index) =>
+									index >= updatedIndex.minIndex &&
+									index <= updatedIndex.maxIndex && (
+										<div
+											key={item.id}
+											className='relative w-96 group'
+										>
+											<img
+												src={item.image}
+												alt={item.name}
+												className='h-72 min-w-[384px] object-cover rounded-3xl shadow-lg z-20 opacity-90 cursor-pointer transition-transform duration-300 transform group-hover:-translate-y-12 '
 												onClick={(e) =>
 													showProductDetails(
 														item,
@@ -509,15 +400,118 @@ function ProductList({ updateCartCount }) {
 														e
 													)
 												}
-											>
-												show more...
-											</div>
-										</div>
-									</div>
+											/>
 
-									<div className='product-wrapper transition-transform duration-300 transform group-hover:-translate-y-12 pointer-events-none'></div>
-								</div>
-							))}
+											<button
+												onClick={openWhatsApp}
+												className='absolute top-5 right-5 z-10 bg-white rounded p-1 shadow h-6 w-6  text-slate-500 '
+											>
+												<SiWhatsapp />
+											</button>
+
+											<div className='mx-5 p-3 flex flex-col absolute bottom-12 left-0 right-0 z-10 capitalize'>
+												<span className='font-bold text-white'>
+													{item.name}
+												</span>
+												<div className='flex justify-between'>
+													<span className='font-medium text-base text-white'>
+														{item.company}
+													</span>
+													<button
+														className='bg-slate-800 rounded-md text-white p-1 shadow-xl text-sm'
+														onClick={(e) =>
+															handleAddCart(
+																e,
+																item,
+																index
+															)
+														}
+													>
+														{countButton.includes(
+															index
+														) ? (
+															<div>
+																Go to cart
+															</div>
+														) : (
+															<div>
+																Add to cart
+															</div>
+														)}
+													</button>
+												</div>
+											</div>
+
+											<div className='absolute -bottom-12 text-lg xl:text-lg bg-slate-100 mx-5 p-3 text-slate-500 capitalize z-30 rounded-3xl shadow-xl flex flex-col gap-1'>
+												<div className=' flex justify-between '>
+													<div className='flex flex-col gap-1'>
+														<div className='text-sm '>
+															{item.description
+																.substring(
+																	0,
+																	60
+																)
+																.trim()}
+															...
+														</div>
+													</div>
+													<div>
+														<div className='text-slate-800 text-base text-end'>
+															₹{item.price}
+														</div>
+														<div className='flex text-slate-500 text-xs capitalize flex-nowrap '>
+															<span>M.R.P.:</span>
+															<span className='line-through'>
+																₹
+																{item.price +
+																	1000}
+															</span>
+														</div>
+													</div>
+												</div>
+												<div className='flex gap-[10px] h-auto flex-wrap'>
+													{item.category &&
+														item.category.map(
+															(
+																category,
+																index
+															) => {
+																return (
+																	index <
+																		2 && (
+																		<div
+																			className='text-xs bg-gray-200 max-w-max rounded p-[2px] font-medium text-slate-600 '
+																			key={
+																				index
+																			}
+																		>
+																			{
+																				category
+																			}
+																		</div>
+																	)
+																);
+															}
+														)}
+													<div
+														className='text-xs font-medium cursor-pointer'
+														onClick={(e) =>
+															showProductDetails(
+																item,
+																index,
+																e
+															)
+														}
+													>
+														show more...
+													</div>
+												</div>
+											</div>
+
+											<div className='product-wrapper transition-transform duration-300 transform group-hover:-translate-y-12 pointer-events-none'></div>
+										</div>
+									)
+							)}
 					</div>
 
 					<div className='flex justify-center  my-28 py-2 px-4  '>
@@ -525,8 +519,8 @@ function ProductList({ updateCartCount }) {
 							<button
 								className='h-12 w-12 shadow-xl text-3xl rounded-md bg-slate-200 text-slate-500'
 								value={1}
-								onClick={(e) => {
-									setPage(e);
+								onClick={() => {
+									setCurrentPage(1);
 								}}
 							>
 								1
@@ -534,8 +528,8 @@ function ProductList({ updateCartCount }) {
 							<button
 								className='h-12 w-12 shadow-xl text-3xl rounded-md bg-slate-200 text-slate-500'
 								value={2}
-								onClick={(e) => {
-									setPage(e);
+								onClick={() => {
+									setCurrentPage(2);
 								}}
 							>
 								2
@@ -543,8 +537,8 @@ function ProductList({ updateCartCount }) {
 							<button
 								className='h-12 w-12 shadow-xl text-3xl rounded-md bg-slate-200 text-slate-500'
 								value={3}
-								onClick={(e) => {
-									setPage(e);
+								onClick={() => {
+									setCurrentPage(3);
 								}}
 							>
 								3
@@ -552,8 +546,8 @@ function ProductList({ updateCartCount }) {
 							<button
 								className='h-12 w-12 shadow-xl text-3xl rounded-md bg-slate-200 text-slate-500'
 								value={4}
-								onClick={(e) => {
-									setPage(e);
+								onClick={() => {
+									setCurrentPage(4);
 								}}
 							>
 								4
