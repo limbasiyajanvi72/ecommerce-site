@@ -171,29 +171,29 @@ function Header(props) {
 						{isVisible ? (
 							<ul
 								className='absolute drop-shadow-xl bg-white justify-center'
-								style={{ left: "-50%", top: "140%" }}
+								style={{ right: "60%", top: "140%" }}
 							>
 								{login ? (
-									<div>
+									<div className='w-[130px] flex flex-col items-start gap-1 p-2 '>
 										<button
 											onClick={handleLogout}
-											className=' cursor-pointer text-slate-800 text-base p-2'
+											className='text-left cursor-pointer text-slate-800 text-base p-1 w-[110px] hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
 										>
 											Logout
 										</button>
 										<Link
 											to={ROUTES.ADDPRODUCTS}
-											className='cursor-pointer text-slate-800 text-base p-2 flex'
+											className='text-left cursor-pointer text-slate-800 text-base p-1 flex w-[110px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
 										>
 											Add product
 										</Link>
 									</div>
 								) : (
-									<div>
+									<div className='flex flex-col items-start gap-1 p-2 w-[80px]'>
 										<div>
 											<Link
 												to={ROUTES.REGISTER}
-												className='cursor-pointer text-slate-800 text-base p-2'
+												className='text-left cursor-pointer text-slate-800 text-base p-1 flex w-[65px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
 											>
 												Register
 											</Link>
@@ -201,7 +201,7 @@ function Header(props) {
 										<div>
 											<Link
 												to={ROUTES.LOGIN}
-												className='cursor-pointer text-slate-800 text-base p-2'
+												className=' text-left cursor-pointer text-slate-800 text-base p-1 flex w-[65px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
 											>
 												Login
 											</Link>
