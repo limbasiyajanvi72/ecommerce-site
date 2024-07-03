@@ -59,7 +59,7 @@ function CartButton({ index, onRemoveItem, productQuantity, maxCartCount }) {
 				<span>
 					<input
 						type='number'
-						className='w-4 hover:border-0 focus:border-0 text-base font-medium text-center'
+						className='w-4 hover:border-0 focus:border-0 text-base font-medium text-center bg-white'
 						value={productCount}
 						style={{
 							WebkitAppearance: "textfield",

@@ -3,6 +3,8 @@ import Header from "../../components/global/Header/Header";
 import Footer from "../../components/global/Footer/Footer";
 import CartButton from "../../components/CartButton/CartButton";
 import { useSelector } from "react-redux";
+import { get, getDatabase, ref } from "firebase/database";
+import { app } from "../../utils/firebase";
 
 function Cart() {
 	const [cartData, setCartData] = useState();
@@ -10,23 +12,20 @@ function Cart() {
 	const [loginStatus, setLoginStatus] = useState(false);
 	const { searchItems } = useSelector((state) => state.search);
 
-	useEffect(() => {
-		let data = JSON.parse(localStorage.getItem("cart"));
-		setCartData(data);
+	// useEffect(() => {
+	// 	let data = JSON.parse(localStorage.getItem("cart"));
+	// 	setCartData(data);
 
-		let cartLocalData = JSON.parse(localStorage.getItem("cart")) || [];
-		let countlocal = Object.keys(cartLocalData).length;
-		setCount(countlocal);
+	// 	let cartLocalData = JSON.parse(localStorage.getItem("cart")) || [];
+	// 	let countlocal = Object.keys(cartLocalData).length;
+	// 	setCount(countlocal);
 
-		let quantity = [];
-		cartLocalData.map((cart) => {
-			let qty = cart.productQuantity;
-			quantity.push(qty);
-		});
-
-		let loginstatus = JSON.parse(localStorage.getItem("loginstatus"));
-		setLoginStatus(loginstatus);
-	}, []);
+	// 	let quantity = [];
+	// 	cartLocalData.map((cart) => {
+	// 		let qty = cart.productQuantity;
+	// 		quantity.push(qty);
+	// 	});
+	// }, []);
 
 	const filterCart = useCallback(() => {
 		if (!cartData) return;
@@ -34,7 +33,7 @@ function Cart() {
 			cart.name.includes(searchItems)
 		);
 		setCartData(filteredData);
-	}, [searchItems, cartData]);
+	}, [searchItems]);
 
 	const handleRemoveItem = (index) => {
 		const updatedCartData = [...cartData];
@@ -53,7 +52,7 @@ function Cart() {
 			{loginStatus && (
 				<div>
 					<Header cartCount={count} />
-					<div className=' items-center flex flex-col mt-24'>
+					<div className=' items-center flex flex-col mt-24 bg-white'>
 						{cartData &&
 							cartData.map((data, index) => (
 								<div

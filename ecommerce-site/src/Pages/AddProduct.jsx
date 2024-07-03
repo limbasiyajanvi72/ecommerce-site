@@ -24,7 +24,7 @@ export const AddProduct = () => {
 		category: [],
 		color: [],
 	});
-	console.log("product data:", editProductData);
+
 	const onChangeHandler = (event) => {
 		setEditProductData({
 			...editProductData,

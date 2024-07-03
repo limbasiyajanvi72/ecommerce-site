@@ -48,10 +48,10 @@ function Verify() {
 			let status = true;
 			localStorage.setItem("verifystatus", JSON.stringify(status));
 
-			let login = JSON.parse(localStorage.getItem("loginstatus"));
+			let token = localStorage.getItem("token");
 			let verify = JSON.parse(localStorage.getItem("verifystatus"));
-			if (login && verify) {
-				navigate("/");
+			{
+				token && verify && navigate("/");
 			}
 		} else {
 			if (!toast.isActive("unsuccessful"))

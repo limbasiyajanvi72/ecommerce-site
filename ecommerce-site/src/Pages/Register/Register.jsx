@@ -2,6 +2,12 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ROUTES from "../../Constants/constant";
+import { app, data } from "../../utils/firebase";
+import { auth } from "../../utils/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { getDatabase, ref, set } from "firebase/database";
+import { ToastContainer, toast } from "react-toastify";
 
 function Register() {
 	const [formData, setFormData] = useState({
@@ -15,6 +21,7 @@ function Register() {
 	const [validationErrors, setValidationErrors] = useState({});
 	const navigate = useNavigate();
 	const uselocation = useLocation();
+	const [errorPopUp, setErrorPopUp] = useState(false);
 
 	useEffect(() => {
 		let index = JSON.parse(localStorage.getItem("index"));
@@ -24,26 +31,71 @@ function Register() {
 		}
 	}, []);
 
-	const onSubmit = () => {
+	const onSubmit = async () => {
+		// const errors = validateForm(formData);
+		// setValidationErrors(errors);
+		// if (Object.keys(errors).length > 0) {
+		// 	return;
+		// }
+		// let userData = JSON.parse(localStorage.getItem("user")) || [];
+		// let index = JSON.parse(localStorage.getItem("index"));
+		// // let data = JSON.parse(localStorage.getItem("user"));
+		// if (uselocation.pathname === ROUTES.EDIT) {
+		// 	navigate(ROUTES.LOGIN);
+		// 	userData[index] = formData;
+		// 	localStorage.setItem("user", JSON.stringify(userData));
+		// } else {
+		// 	if (!Array.isArray(userData)) {
+		// 		userData = [];
+		// 	}
+		// 	userData.push(formData);
+		// 	localStorage.setItem("user", JSON.stringify(userData));
+		// 	navigate(ROUTES.LOGIN);
+		// }
+		const db = getDatabase(app);
 		const errors = validateForm(formData);
 		setValidationErrors(errors);
 		if (Object.keys(errors).length > 0) {
 			return;
 		}
-		let userData = JSON.parse(localStorage.getItem("user")) || [];
-		let index = JSON.parse(localStorage.getItem("index"));
-		// let data = JSON.parse(localStorage.getItem("user"));
-		if (uselocation.pathname === ROUTES.EDIT) {
-			navigate(ROUTES.LOGIN);
-			userData[index] = formData;
-			localStorage.setItem("user", JSON.stringify(userData));
-		} else {
-			if (!Array.isArray(userData)) {
-				userData = [];
+		try {
+			await createUserWithEmailAndPassword(
+				auth,
+				formData.email,
+				formData.password
+			);
+			const user = auth.currentUser;
+			console.log("user", user);
+
+			if (user) {
+				console.log("userid while register:", user.uid);
+				await set(ref(db, "users/" + user.uid), {
+					firstname: formData.firstname,
+					lastname: formData.lastname,
+					dob: formData.dob,
+					address: formData.adress,
+					email: formData.email,
+					password: formData.password,
+				});
 			}
-			userData.push(formData);
-			localStorage.setItem("user", JSON.stringify(userData));
+
 			navigate(ROUTES.LOGIN);
+			console.log("account created");
+		} catch (err) {
+			if (err.code === "auth/email-already-in-use") {
+				toast(`Email id is already registered `, {
+					className: "toastify-style",
+					toastId: "registered-email",
+				});
+
+				console.log(
+					"The email address is already in use by another account."
+				);
+				// Optionally, display an error message to the user
+			} else {
+				console.log("An error occurred:", err);
+				// Optionally, display a generic error message to the user
+			}
 		}
 	};
 
@@ -60,7 +112,7 @@ function Register() {
 		if (!values.password.trim()) {
 			errors.password = "Password is required";
 		} else {
-			if (values.password.length < 4 || values.password.length > 10) {
+			if (values.password.length < 6 || values.password.length > 10) {
 				errors.password =
 					"Length should be greater than 4 and less than 10";
 			}
@@ -126,6 +178,7 @@ function Register() {
 
 	return (
 		<div className='flex justify-center min-h-screen min-w-screen items-center text-black font-sans font-light bg-gray-950'>
+			<ToastContainer />
 			<div className='p-[1px] w-[340px] bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-800 rounded-lg'>
 				<div
 					className='shadow-2xl flex flex-col justify-center gap-4 px-12 py-6 text-start bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-800 rounded-lg text-slate-400'
@@ -295,7 +348,7 @@ function Register() {
 					)}
 					<button
 						className='rounded p-1 text-center bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600 text-white font-semibold  shadow-color'
-						onClick={onSubmit}
+						onClick={(e) => onSubmit(e)}
 					>
 						Submit
 					</button>

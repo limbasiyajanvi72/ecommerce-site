@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "../../../index.css";
 
 function ProductCategory() {
 	const [apiData, setApiData] = useState();
@@ -125,7 +126,7 @@ function ProductCategory() {
 
 	return (
 		<section className=' mx-5 mt-20 min-[370px]:mx-1  max-[640px]:mx-1 '>
-			<div className='flex overflow-x-scroll gap-12  pro-category-style bg-white shadow-lg '>
+			<div className='flex overflow-x-scroll  gap-12  pro-category-style bg-white shadow-lg '>
 				{apiData &&
 					apiData.map((item, index) => (
 						<div

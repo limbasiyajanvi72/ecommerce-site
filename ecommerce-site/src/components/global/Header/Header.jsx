@@ -27,7 +27,7 @@ function Header(props) {
 	};
 
 	useEffect(() => {
-		let loginStatus = JSON.parse(localStorage.getItem("loginstatus"));
+		let loginStatus = localStorage.getItem("token");
 		setLogin(loginStatus);
 	}, []);
 
@@ -40,7 +40,7 @@ function Header(props) {
 	}
 
 	function handleLogout() {
-		localStorage.setItem("loginstatus", JSON.stringify(false));
+		localStorage.removeItem("token");
 		setLogin(false);
 		navigate("/");
 	}
@@ -169,46 +169,52 @@ function Header(props) {
 							<img src={Profile} alt='profile-icon' />
 						</div>
 						{isVisible ? (
-							<ul
-								className='absolute drop-shadow-xl bg-white justify-center'
-								style={{ right: "60%", top: "140%" }}
-							>
-								{login ? (
-									<div className='w-[130px] flex flex-col items-start gap-1 p-2 '>
-										<button
-											onClick={handleLogout}
-											className='text-left cursor-pointer text-slate-800 text-base p-1 w-[110px] hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
-										>
-											Logout
-										</button>
-										<Link
-											to={ROUTES.ADDPRODUCTS}
-											className='text-left cursor-pointer text-slate-800 text-base p-1 flex w-[110px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
-										>
-											Add product
-										</Link>
-									</div>
-								) : (
-									<div className='flex flex-col items-start gap-1 p-2 w-[80px]'>
-										<div>
-											<Link
-												to={ROUTES.REGISTER}
-												className='text-left cursor-pointer text-slate-800 text-base p-1 flex w-[65px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
+							<div>
+								<ul
+									className='absolute drop-shadow-xl bg-white justify-center z-50'
+									style={{ right: "60%", top: "140%" }}
+								>
+									{login ? (
+										<div className='w-[130px] flex flex-col items-start gap-1 p-2 '>
+											<button
+												onClick={handleLogout}
+												className='text-left cursor-pointer text-slate-800 text-base p-1 w-[110px] hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
 											>
-												Register
+												Logout
+											</button>
+											<Link
+												to={ROUTES.ADDPRODUCTS}
+												className='text-left cursor-pointer text-slate-800 text-base p-1 flex w-[110px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
+											>
+												Add product
 											</Link>
 										</div>
-										<div>
-											<Link
-												to={ROUTES.LOGIN}
-												className=' text-left cursor-pointer text-slate-800 text-base p-1 flex w-[65px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
-											>
-												Login
-											</Link>
+									) : (
+										<div className='flex flex-col items-start gap-1 p-2 w-[80px]'>
+											<div>
+												<Link
+													to={ROUTES.REGISTER}
+													className='text-left cursor-pointer text-slate-800 text-base p-1 flex w-[65px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
+												>
+													Register
+												</Link>
+											</div>
+											<div>
+												<Link
+													to={ROUTES.LOGIN}
+													className=' text-left cursor-pointer text-slate-800 text-base p-1 flex w-[65px]  hover:bg-slate-600 hover:text-white border-1 rounded-md border-[#fff]'
+												>
+													Login
+												</Link>
+											</div>
 										</div>
-									</div>
-								)}
-							</ul>
+									)}
+								</ul>
+								<div
+									className='bg-transparent fixed inset-0 z-60'
+									onClick={toggleVisibility}
+								></div>
+							</div>
 						) : null}
 					</div>
 				</div>

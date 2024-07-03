@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import ROUTES from "../../Constants/constant";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { auth } from "../../utils/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 
 function Login() {
 	const [formData, setFormData] = useState({
@@ -10,33 +13,57 @@ function Login() {
 		email: "",
 	});
 	const navigate = useNavigate();
+	const [errorPopUp, setErrorPopUp] = useState(false);
 
-	const handleSubmit = (e) => {
-		let loggedUserdata = JSON.parse(localStorage.getItem("user"));
+	const handleSubmit = async (e) => {
+		// let loggedUserdata = JSON.parse(localStorage.getItem("user"));
+		// let isLoggedIn = false;
+		// if (!loggedUserdata && !toast.isActive("please-register-toast")) {
+		// 	toast("Please Register", {
+		// 		className: "toastify-style",
+		// 		toastId: "please-register-toast",
+		// 	});
+		// 	return;
+		// }
+		// loggedUserdata.map((val) => {
+		// 	if (
+		// 		val.email === formData.email &&
+		// 		val.password === formData.password
+		// 	) {
+		// 		navigate(ROUTES.VERIFY);
+		// 		isLoggedIn = true;
+		// 		localStorage.setItem("loginstatus", JSON.stringify(isLoggedIn));
+		// 	}
+		// 	return true;
+		// });
+		// if (!isLoggedIn && !toast.isActive("invalid-credential-toast")) {
+		// 	toast("invalid credential", {
+		// 		className: "toastify-style",
+		// 		toastId: "invalid-credential-toast",
+		// 	});
+		// }
 		let isLoggedIn = false;
-		if (!loggedUserdata && !toast.isActive("please-register-toast")) {
-			toast("Please Register", {
-				className: "toastify-style",
-				toastId: "please-register-toast",
-			});
-			return;
-		}
-		loggedUserdata.map((val) => {
-			if (
-				val.email === formData.email &&
-				val.password === formData.password
-			) {
-				navigate(ROUTES.VERIFY);
-				isLoggedIn = true;
-				localStorage.setItem("loginstatus", JSON.stringify(isLoggedIn));
+
+		try {
+			await signInWithEmailAndPassword(
+				auth,
+				formData.email,
+				formData.password
+			);
+			isLoggedIn = true;
+			const token = await auth.currentUser.getIdToken();
+			console.log("token", token);
+			localStorage.setItem("token", token);
+			navigate(ROUTES.VERIFY);
+			console.log("login successfully");
+		} catch (err) {
+			if (err.code === "auth/invalid-credential") {
+				toast(`Enter Valid Credentials `, {
+					className: "toastify-style",
+					toastId: "invalid-cred",
+				});
 			}
-			return true;
-		});
-		if (!isLoggedIn && !toast.isActive("invalid-credential-toast")) {
-			toast("invalid credential", {
-				className: "toastify-style",
-				toastId: "invalid-credential-toast",
-			});
+			console.log(err);
 		}
 	};
 
@@ -96,6 +123,29 @@ function Login() {
 					</button>
 				</div>
 			</div>
+			{errorPopUp && (
+				<div className='fixed inset-0 flex items-center justify-center z-50'>
+					<div className=''>
+						<div className='modal-box min-w-[340px] max-w-[380px] '>
+							<h2 className='font-bold text-lg text-slate-400'>
+								Error
+							</h2>
+							<p className='py-4  text-slate-400 '>
+								Enter valid credentials
+							</p>
+							<div className='modal-action'>
+								<button
+									className='btn rounded px-8 text-center bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600 text-white font-semibold  shadow-color'
+									onClick={() => setErrorPopUp(false)}
+								>
+									Close
+								</button>
+							</div>
+						</div>
+					</div>
+					<div className='modal-backdrop'></div>
+				</div>
+			)}
 		</div>
 	);
 }

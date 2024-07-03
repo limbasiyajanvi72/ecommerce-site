@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/static/css/main.fbb144e4.css",
+    "main.js": "/static/js/main.a949cdda.js",
+    "static/media/Carousel1.jpg": "/static/media/Carousel1.6db0edc0cb3e400e254d.jpg",
+    "static/media/Carousel2.jpg": "/static/media/Carousel2.a94744c92f977893615e.jpg",
+    "static/media/Carousel3.jpg": "/static/media/Carousel3.dd051c0ff13f73e0077d.jpg",
+    "static/media/user_3237472.png": "/static/media/user_3237472.45a0af68515332b42be9.png",
+    "static/media/trolley.png": "/static/media/trolley.e26818c0ffe739d3f9e1.png",
+    "static/media/slick.svg": "/static/media/slick.2630a3e3eab21c607e21.svg",
+    "static/media/slick.eot": "/static/media/slick.a4e97f5a2a64f0ab1323.eot",
+    "static/media/slick.ttf": "/static/media/slick.c94f7671dcc99dce43e2.ttf",
+    "static/media/slick.woff": "/static/media/slick.295183786cd8a1389865.woff",
+    "index.html": "/index.html",
+    "main.fbb144e4.css.map": "/static/css/main.fbb144e4.css.map",
+    "main.a949cdda.js.map": "/static/js/main.a949cdda.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fbb144e4.css",
+    "static/js/main.a949cdda.js"
+  ]
+}

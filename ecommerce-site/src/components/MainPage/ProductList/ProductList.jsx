@@ -8,7 +8,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { productSliceActions } from "../../../redux/Slice/productSlice";
 import { filterSliceActions } from "../../../redux/Slice/filterSlice";
 import { app } from "../../../utils/firebase"; // Import the initialized Firebase app
-import { getDatabase, ref, get } from "firebase/database";
+import {
+	getDatabase,
+	ref,
+	get,
+	set,
+	update,
+	onValue,
+	orderByChild,
+	push,
+} from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 function ProductList({ updateCartCount }) {
 	const navigate = useNavigate();
@@ -215,61 +225,191 @@ function ProductList({ updateCartCount }) {
 		applyFilter();
 	}, [applyFilter]);
 
-	const handleAddCart = (e, item, index) => {
+	const handleAddCart = async (e, item, index) => {
 		e.preventDefault();
-		let loginStatus = JSON.parse(localStorage.getItem("loginstatus"));
-		if (!loginStatus) {
-			toast("First login", {
-				className: "toastify-style",
-				toastId: "checkedLogin",
-			});
+		let loginStatus = localStorage.getItem("token");
+		{
+			!loginStatus &&
+				toast("First login", {
+					className: "toastify-style",
+					toastId: "checkedLogin",
+				});
 		}
-		let cartLocalData = JSON.parse(localStorage.getItem("cart")) || [];
+		// let cartLocalData = JSON.parse(localStorage.getItem("cart")) || [];
 
-		let isDuplicate = cartLocalData.some(
-			(cartItem) => cartItem.id === item.id
-		);
+		// let isDuplicate = cartLocalData.some(
+		// 	(cartItem) => cartItem.id === item.id
+		// );
 
-		if (
-			isDuplicate &&
-			!toast.isActive("checkedLogin") &&
-			!toast.isActive("itemExist")
-		) {
-			toast("Item already exists in the cart.", {
-				className: "toastify-style",
-				toastId: "itemExist",
-			});
-			return;
-		}
+		// if (
+		// 	isDuplicate &&
+		// 	!toast.isActive("checkedLogin") &&
+		// 	!toast.isActive("itemExist")
+		// ) {
+		// 	toast("Item already exists in the cart.", {
+		// 		className: "toastify-style",
+		// 		toastId: "itemExist",
+		// 	});
+		// 	return;
+		// }
 
-		if (cartLocalData.length >= 5 && !toast.isActive("checkedLogin")) {
-			toast("You cannot add more than 5 items.", {
-				className: "toastify-style",
-				toastId: "more than 5 items",
-			});
-			return;
-		}
-		if (cartLocalData.length <= 5 && loginStatus) {
-			cartLocalData.push(item);
-		}
+		// if (cartLocalData.length >= 5 && !toast.isActive("checkedLogin")) {
+		// 	toast("You cannot add more than 5 items.", {
+		// 		className: "toastify-style",
+		// 		toastId: "more than 5 items",
+		// 	});
+		// 	return;
+		// }
+		// if (cartLocalData.length <= 5 && loginStatus) {
+		// 	cartLocalData.push(item);
+		// }
 
-		let cartWithQty = cartLocalData.map((cart, index) => ({
-			...cart,
-			productQuantity: 1,
-		}));
+		// let cartWithQty = cartLocalData.map((cart, index) => ({
+		// 	...cart,
+		// 	productQuantity: 1,
+		// }));
 
-		localStorage.setItem("cart", JSON.stringify(cartWithQty));
-		let cartButtonData = JSON.parse(localStorage.getItem("cart")) || [];
-		let currentIndex = index;
-		cartButtonData.forEach((data) => {
-			if (data.id === item.id) {
-				setCountButton((prevIndex) => [...prevIndex, currentIndex]);
+		// localStorage.setItem("cart", JSON.stringify(cartWithQty));
+		// let cartButtonData = JSON.parse(localStorage.getItem("cart")) || [];
+		// let currentIndex = index;
+		// cartButtonData.forEach((data) => {
+		// 	if (data.id === item.id) {
+		// 		setCountButton((prevIndex) => [...prevIndex, currentIndex]);
+		// 	}
+		// });
+		// if (countButton.includes(index)) {
+		// 	navigate(ROUTES.CART);
+		// }
+		// updateCartCount(cartButtonData.length);
+		const db = getDatabase(app);
+		const auth = getAuth();
+
+		onAuthStateChanged(auth, (user) => {
+			if (user) {
+				const userId = user.uid;
+				const cartRef = ref(db, `carts/${userId}`);
+
+				get(cartRef)
+					.then((snapshot) => {
+						if (snapshot.exists()) {
+							addProductToCart(userId, item.id);
+						} else {
+							createCartAndAddProduct(userId, item.id);
+						}
+					})
+					.catch((error) => {
+						console.error("Error checking user's cart:", error);
+					});
+			} else {
+				console.log("User is not signed in");
 			}
 		});
-		if (countButton.includes(index)) {
-			navigate(ROUTES.CART);
+
+		// function addProductToCart(userId, itemId) {
+		// 	const cartRef = ref(db, `carts/${userId}`);
+
+		// 	get(cartRef).then((snapshot) => {
+		// 		const cartData = snapshot.val();
+
+		// 		const newItemIndex = cartData
+		// 			? Object.keys(cartData).length
+		// 			: 0;
+
+		// 		const newItemRef = ref(db, `carts/${userId}/${newItemIndex}`);
+		// 		set(newItemRef, {
+		// 			productId: itemId,
+		// 			qty: 1,
+		// 		})
+		// 			.then(() => {
+		// 				console.log("Item added to cart successfully");
+		// 			})
+		// 			.catch((error) => {
+		// 				console.error("Error adding item to cart:", error);
+		// 			});
+		// 	});
+		// }
+		function addProductToCart(userId, itemId) {
+			const cartRef = ref(db, `carts/${userId}`);
+
+			get(cartRef).then((snapshot) => {
+				const cartData = snapshot.val();
+				if (snapshot.exists()) {
+					const cartData = snapshot.val();
+					const numberOfItems = Object.keys(cartData).length;
+
+					updateCartCount(numberOfItems);
+				}
+
+				if (cartData) {
+					// Check if the item is already in the cart
+					const itemExists = Object.values(cartData).some(
+						(item) => item.productId === itemId
+					);
+
+					if (itemExists) {
+						toast("Item already exists in the cart.", {
+							className: "toastify-style",
+							toastId: "itemExist",
+						});
+					} else {
+						// Add the new item to the cart
+						const newItemIndex = Object.keys(cartData).length;
+						const newItemRef = ref(
+							db,
+							`carts/${userId}/${newItemIndex}`
+						);
+						set(newItemRef, {
+							productId: itemId,
+							qty: 1,
+						})
+							.then(() => {
+								toast("Item is added to cart successfully.", {
+									className: "toastify-style",
+									toastId: "success-add-cart",
+								});
+							})
+							.catch((error) => {
+								console.error(
+									"Error adding item to cart:",
+									error
+								);
+							});
+					}
+				} else {
+					// Cart does not exist, create it and add the item
+					const newItemRef = ref(db, `carts/${userId}/0`);
+					set(newItemRef, {
+						productId: itemId,
+						qty: 1,
+					})
+						.then(() => {
+							toast("Item is added to cart successfully.", {
+								className: "toastify-style",
+								toastId: "success-add-cart",
+							});
+						})
+						.catch((error) => {
+							console.error("Error adding item to cart:", error);
+						});
+				}
+			});
 		}
-		updateCartCount(cartButtonData.length);
+
+		function createCartAndAddProduct(userId, itemId) {
+			set(ref(db, `carts/${userId}/0`), {
+				productId: itemId,
+				qty: 1,
+			})
+				.then(() => {
+					console.log("Cart created and item added successfully");
+				})
+				.catch((error) => {
+					console.error(
+						"Error creating cart and adding item:",
+						error
+					);
+				});
+		}
 	};
 	const showProductDetails = (item, id, e) => {
 		e.preventDefault();
@@ -320,7 +460,7 @@ function ProductList({ updateCartCount }) {
 			default:
 				return;
 		}
-	}, [currentPage, updatedIndex]);
+	}, [currentPage]);
 	// const setData = () => {
 	// 	switch (currentPage) {
 	// 		case 1:
