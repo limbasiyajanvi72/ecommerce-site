@@ -18,7 +18,7 @@ const Layout = () => {
 	const { isOpenFilter } = useSelector((state) => state.filter);
 
 	const updateCartCount = (newCount) => {
-		setCount(newCount); // Update count state when newCount changes
+		setCount(newCount);
 	};
 
 	const getCountFromDB = () => {
@@ -34,11 +34,8 @@ const Layout = () => {
 							const cartData = snapshot.val();
 							const numberOfItems = Object.keys(cartData).length;
 							setCount(numberOfItems);
-
-							// Update count state with number of items
 						} else {
 							setCount(0);
-							// Update count state to 0 if cart is empty
 						}
 					})
 					.catch((error) => {

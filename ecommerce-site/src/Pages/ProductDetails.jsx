@@ -248,14 +248,14 @@ function ProductDetails() {
 											))}
 									</div>
 									<div className='justify-start'>
-										<div className='text-slate-700 text-sm	'>
+										<div className='text-slate-400 text-sm	'>
 											{data.shipping && (
 												<div className=' font-medium '>
 													Free Delivery
 												</div>
 											)}
 										</div>
-										<div className='text-slate-700 text-sm flex 	gap-1'>
+										<div className='text-slate-400 text-sm flex 	gap-1'>
 											<span className='font-medium'>
 												Category:
 											</span>
@@ -284,7 +284,7 @@ function ProductDetails() {
 												alt='trolly'
 												className='h-7 w-7 m-2'
 											/>
-											<span className='m-2 pt-1 font-semibold text-slate-700 '>
+											<span className='m-2 pt-1 font-semibold text-slate-300 '>
 												Add to Cart
 											</span>
 										</button>

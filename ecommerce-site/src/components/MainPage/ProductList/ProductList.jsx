@@ -305,29 +305,6 @@ function ProductList({ updateCartCount }) {
 			}
 		});
 
-		// function addProductToCart(userId, itemId) {
-		// 	const cartRef = ref(db, `carts/${userId}`);
-
-		// 	get(cartRef).then((snapshot) => {
-		// 		const cartData = snapshot.val();
-
-		// 		const newItemIndex = cartData
-		// 			? Object.keys(cartData).length
-		// 			: 0;
-
-		// 		const newItemRef = ref(db, `carts/${userId}/${newItemIndex}`);
-		// 		set(newItemRef, {
-		// 			productId: itemId,
-		// 			qty: 1,
-		// 		})
-		// 			.then(() => {
-		// 				console.log("Item added to cart successfully");
-		// 			})
-		// 			.catch((error) => {
-		// 				console.error("Error adding item to cart:", error);
-		// 			});
-		// 	});
-		// }
 		function addProductToCart(userId, itemId) {
 			const cartRef = ref(db, `carts/${userId}`);
 
@@ -336,12 +313,10 @@ function ProductList({ updateCartCount }) {
 				if (snapshot.exists()) {
 					const cartData = snapshot.val();
 					const numberOfItems = Object.keys(cartData).length;
-
 					updateCartCount(numberOfItems);
 				}
 
 				if (cartData) {
-					// Check if the item is already in the cart
 					const itemExists = Object.values(cartData).some(
 						(item) => item.productId === itemId
 					);
@@ -376,7 +351,6 @@ function ProductList({ updateCartCount }) {
 							});
 					}
 				} else {
-					// Cart does not exist, create it and add the item
 					const newItemRef = ref(db, `carts/${userId}/0`);
 					set(newItemRef, {
 						productId: itemId,
