@@ -2,8 +2,8 @@ import React from "react";
 
 function Footer() {
 	return (
-		<>
-			<div className=' bg-slate-950 text-white px-3 md:px-12 pt-24 hover:cursor-pointer sm:px-2 sm:w-full sm:justify-between md:w-full lg:px-52 lg:justify-between'>
+		<div className='bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-800 py-[2px] shadow-color'>
+			<div className=' bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-800 text-white px-3 md:px-12 pt-24 hover:cursor-pointer sm:px-2 sm:w-full sm:justify-between md:w-full lg:px-52 lg:justify-between shadow-color '>
 				<div className='flex justify-around md:justify-around sm:justify-between sm:m-0 sm:p-0'>
 					<div>
 						<div className='font-bold '>Get to Know Us</div>
@@ -63,7 +63,7 @@ function Footer() {
 					</ul>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 

@@ -108,7 +108,7 @@ function Header(props) {
 					<div className='text-4xl font-semibold pb-4'>A</div>
 
 					<div className='text-xl font-semibold pt-3 sm:block md:block lg:block min-[370px]:hidden  max-[640px]:hidden'>
-						mazona
+						MAZONA
 					</div>
 				</div>
 				<div className='relative  '>
@@ -118,9 +118,9 @@ function Header(props) {
 
 					<input
 						type='text'
-						placeholder='search'
+						placeholder='Search'
 						value={searchValue}
-						className='bg-slate-950 border-slate-500 rounded pr-96 pl-8 py-1 border focus:outline-0 lg:pr-96 md:pr-64 sm:pr-32 min-[370px]:pr-3  max-[640px]:pr-3'
+						className='bg-white border-slate-500 rounded-3xl pr-96 pl-8 py-1 border focus:outline-0 lg:pr-96 md:pr-64 sm:pr-32 min-[370px]:pr-3  max-[640px]:pr-3'
 						onChange={(e) => handleSearch(e)}
 						onKeyDown={(e) => {
 							handleKeyEvent(e);

@@ -235,52 +235,7 @@ function ProductList({ updateCartCount }) {
 					toastId: "checkedLogin",
 				});
 		}
-		// let cartLocalData = JSON.parse(localStorage.getItem("cart")) || [];
 
-		// let isDuplicate = cartLocalData.some(
-		// 	(cartItem) => cartItem.id === item.id
-		// );
-
-		// if (
-		// 	isDuplicate &&
-		// 	!toast.isActive("checkedLogin") &&
-		// 	!toast.isActive("itemExist")
-		// ) {
-		// 	toast("Item already exists in the cart.", {
-		// 		className: "toastify-style",
-		// 		toastId: "itemExist",
-		// 	});
-		// 	return;
-		// }
-
-		// if (cartLocalData.length >= 5 && !toast.isActive("checkedLogin")) {
-		// 	toast("You cannot add more than 5 items.", {
-		// 		className: "toastify-style",
-		// 		toastId: "more than 5 items",
-		// 	});
-		// 	return;
-		// }
-		// if (cartLocalData.length <= 5 && loginStatus) {
-		// 	cartLocalData.push(item);
-		// }
-
-		// let cartWithQty = cartLocalData.map((cart, index) => ({
-		// 	...cart,
-		// 	productQuantity: 1,
-		// }));
-
-		// localStorage.setItem("cart", JSON.stringify(cartWithQty));
-		// let cartButtonData = JSON.parse(localStorage.getItem("cart")) || [];
-		// let currentIndex = index;
-		// cartButtonData.forEach((data) => {
-		// 	if (data.id === item.id) {
-		// 		setCountButton((prevIndex) => [...prevIndex, currentIndex]);
-		// 	}
-		// });
-		// if (countButton.includes(index)) {
-		// 	navigate(ROUTES.CART);
-		// }
-		// updateCartCount(cartButtonData.length);
 		const db = getDatabase(app);
 		const auth = getAuth();
 
@@ -292,9 +247,9 @@ function ProductList({ updateCartCount }) {
 				get(cartRef)
 					.then((snapshot) => {
 						if (snapshot.exists()) {
-							addProductToCart(userId, item.id);
+							addProductToCart(userId, item);
 						} else {
-							createCartAndAddProduct(userId, item.id);
+							createCartAndAddProduct(userId, item);
 						}
 					})
 					.catch((error) => {
@@ -305,7 +260,7 @@ function ProductList({ updateCartCount }) {
 			}
 		});
 
-		function addProductToCart(userId, itemId) {
+		function addProductToCart(userId, product) {
 			const cartRef = ref(db, `carts/${userId}`);
 
 			get(cartRef).then((snapshot) => {
@@ -318,7 +273,7 @@ function ProductList({ updateCartCount }) {
 
 				if (cartData) {
 					const itemExists = Object.values(cartData).some(
-						(item) => item.productId === itemId
+						(item) => item.productId === product.id
 					);
 
 					if (itemExists) {
@@ -334,7 +289,8 @@ function ProductList({ updateCartCount }) {
 							`carts/${userId}/${newItemIndex}`
 						);
 						set(newItemRef, {
-							productId: itemId,
+							productId: product.id,
+							name: product.name,
 							qty: 1,
 						})
 							.then(() => {
@@ -353,7 +309,8 @@ function ProductList({ updateCartCount }) {
 				} else {
 					const newItemRef = ref(db, `carts/${userId}/0`);
 					set(newItemRef, {
-						productId: itemId,
+						productId: product.id,
+						name: product.name,
 						qty: 1,
 					})
 						.then(() => {
@@ -369,9 +326,10 @@ function ProductList({ updateCartCount }) {
 			});
 		}
 
-		function createCartAndAddProduct(userId, itemId) {
+		function createCartAndAddProduct(userId, item) {
 			set(ref(db, `carts/${userId}/0`), {
-				productId: itemId,
+				productId: item.id,
+				name: item.name,
 				qty: 1,
 			})
 				.then(() => {
@@ -541,17 +499,15 @@ function ProductList({ updateCartCount }) {
 															)
 														}
 													>
-														{countButton.includes(
+														{/* {countButton.includes(
 															index
 														) ? (
 															<div>
 																Go to cart
 															</div>
-														) : (
-															<div>
-																Add to cart
-															</div>
-														)}
+														) : ( */}
+														<div>Add to cart</div>
+														{/* )} */}
 													</button>
 												</div>
 											</div>
