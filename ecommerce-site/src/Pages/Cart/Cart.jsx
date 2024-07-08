@@ -137,85 +137,105 @@ function Cart() {
 
 	return (
 		<>
+			{!cartItem && (
+				<div class='loader-container'>
+					<div class='loader'></div>
+				</div>
+			)}
 			<ToastContainer />
+
 			{loginStatus && (
 				<div>
 					<Header cartCount={count} />
-					<div className=' items-center flex flex-col pt-24 bg-slate-950'>
+					<div className=' items-center flex flex-col   bg-slate-950'>
 						{cartItem &&
 							cartItem.map((data, index) => (
-								<div
-									key={index}
-									className='  rounded-3xl bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-800 p-[2px] m-3 '
-								>
-									<div className='block lg:flex rounded-3xl bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-800 p-2'>
-										<div>
-											<img
-												src={data.image}
-												alt={data.name}
-												className='h-64 w-80 object-cover sm:mx-0 md:mx-0 lg:mx-0 sm:w-80 md:w-80 lg:w-80 rounded-3xl'
-											/>
-										</div>
-										<div className='capitalize pl-2 lg:pl-5 text-slate-400 flex flex-col justify-between py-1 flex-nowrap w-72'>
+								<div className={index === 0 ? "pt-24" : ""}>
+									<div
+										key={index}
+										className='  rounded-3xl bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-800 p-[2px] m-3 '
+									>
+										<div className='block md:flex rounded-3xl bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-800 p-2'>
 											<div>
-												<div className='text-lg md:text-lg'>
-													{data.name}
-												</div>
-												<div className='text-sm'>
-													{data.company}
-												</div>
+												<img
+													src={data.image}
+													alt={data.name}
+													className='h-64 w-80 object-cover sm:mx-0 md:mx-0 lg:mx-0 sm:w-80 md:w-80 lg:w-80 rounded-3xl'
+												/>
 											</div>
-											<div className='text-sm   md:text-base'>
-												<span className='inline-block '>
-													{data.category.map(
-														(category) => (
-															<span
-																className='text-sm mr-1 bg-slate-950 rounded px-[3px]'
-																key={
-																	category.index
-																}
-															>
-																{category}
-																{"  "}
-															</span>
-														)
-													)}
-												</span>
-											</div>
-											<div className='flex'>
-												<div className='text-base pr-1'>
-													₹{data.price}
-												</div>
-												<div className='flex text-slate-400 text-left capitalize'>
-													<div className='text-xs pt-1'>
-														<span>M.R.P.:₹</span>
-														<span className='line-through'>
-															{data.price + 1000}
-														</span>
+											<div className='capitalize pl-2 lg:pl-5 text-slate-400 flex flex-col justify-between py-1 flex-nowrap w-80'>
+												<div className='flex justify-between lg:flex lg:flex-col'>
+													<div className='text-lg md:text-lg'>
+														{data.name}
+													</div>
+													<div className='text-sm'>
+														{data.company}
 													</div>
 												</div>
-											</div>
+												<div className='flex justify-between md:flex md:flex-col'>
+													<div className='text-base pr-1'>
+														₹{data.price}
+													</div>
+													<div className='flex text-slate-400 text-left capitalize'>
+														<div className='text-xs pt-1'>
+															<span>
+																M.R.P.:₹
+															</span>
+															<span className='line-through'>
+																{data.price +
+																	1000}
+															</span>
+														</div>
+													</div>
+												</div>
+												<div className='text-sm   md:text-base'>
+													<span className='inline-block '>
+														{data.category.map(
+															(category) => (
+																<span
+																	className='text-sm mr-1 bg-slate-950 rounded px-[3px]'
+																	key={
+																		category.index
+																	}
+																>
+																	{category}
+																	{"  "}
+																</span>
+															)
+														)}
+													</span>
+												</div>
 
-											<CartButton
-												index={index}
-												id={data.id}
-												onRemoveItem={handleRemoveItem}
-												productQuantity={data.quantity}
-												maxCartCount={data.stock}
-											/>
-											<div className='mt-3'>
-												<button
-													className='rounded p-2 text-center bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600 text-white font-semibold  shadow-color'
-													onClick={(e) =>
-														buyNow(
-															e,
-															data.price,
-															data.id
-														)
-													}
-												>
-													Buy Now
-												</button>
+												<div className='flex  justify-between md:flex md:flex-col'>
+													<div className='mt-3 mb-1'>
+														<CartButton
+															index={index}
+															id={data.id}
+															onRemoveItem={
+																handleRemoveItem
+															}
+															productQuantity={
+																data.quantity
+															}
+															maxCartCount={
+																data.stock
+															}
+														/>
+													</div>
+
+													<button
+														className='mt-2 w-32 inline rounded p-2 text-center bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600 text-white font-semibold  shadow-color'
+														onClick={(e) =>
+															buyNow(
+																e,
+																data.price,
+																data.id
+															)
+														}
+													>
+														Buy Now
+													</button>
+												</div>
 											</div>
 										</div>
 									</div>

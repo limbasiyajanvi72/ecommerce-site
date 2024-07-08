@@ -4,80 +4,241 @@ import Footer from "../components/global/Footer/Footer";
 import { useLocation } from "react-router-dom";
 import Trolly from "../../src/assets/images/trolley.png";
 import { useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { get, getDatabase, ref, set } from "firebase/database";
+import { app } from "../utils/firebase";
 
 function ProductDetails() {
 	const location = useLocation();
 	const data = location.state.product;
 	const index = location.state.index;
 	const [count, setCount] = useState(0);
+
 	useEffect(() => {
-		updateCart();
+		let token = localStorage.getItem("token");
+		if (token) {
+			const db = getDatabase(app);
+			const auth = getAuth();
+			onAuthStateChanged(auth, (user) => {
+				const userId = user.uid;
+				const cartRef = ref(db, `carts/${userId}`);
+
+				get(cartRef).then((snapshot) => {
+					if (snapshot.exists()) {
+						let updatedCount = snapshot.val().length;
+						setCount(updatedCount);
+					}
+				});
+			});
+		}
 	}, []);
 
-	const addToCart = (e) => {
+	const addToCart = (e, product) => {
 		e.preventDefault();
-		let loginStatus = JSON.parse(localStorage.getItem("loginstatus"));
-		if (!loginStatus) {
-			alert("First login");
+		const db = getDatabase(app);
+		const auth = getAuth();
+		let token = localStorage.getItem("token");
+		if (token) {
+			onAuthStateChanged(auth, (user) => {
+				const userId = user.uid;
+				const cartRef = ref(db, `carts/${userId}`);
+
+				get(cartRef).then((snapshot) => {
+					if (snapshot.exists()) {
+						addProductToCart(userId, product);
+					} else {
+						createCartAndAddProduct(userId, product);
+					}
+				});
+			});
 		} else {
-			let cartLocalData = JSON.parse(localStorage.getItem("cart")) || [];
-
-			let isDuplicate = cartLocalData.some(
-				(cartItem) => cartItem.id === data.id
-			);
-
-			if (isDuplicate) {
-				alert("Item already exists in the cart.");
-				return;
+			if (!toast.isActive("login")) {
+				toast("You are not logged in", {
+					className: "toastify-style",
+					toastId: "login",
+				});
 			}
-
-			if (cartLocalData.length >= 5) {
-				alert("You cannot add more than 5 items.");
-				return;
-			}
-			cartLocalData.push(data);
-			let cartWithQty = cartLocalData.map((cart, index) => ({
-				...cart,
-				productQuantity: 1,
-			}));
-
-			localStorage.setItem("cart", JSON.stringify(cartWithQty));
 		}
-		updateCart();
+
+		function addProductToCart(userId, product) {
+			const cartRef = ref(db, `carts/${userId}`);
+
+			get(cartRef).then((snapshot) => {
+				const cartData = snapshot.val();
+				if (snapshot.exists()) {
+					const cartData = snapshot.val();
+					const numberOfItems = Object.keys(cartData).length;
+					setCount(numberOfItems);
+				}
+
+				if (cartData) {
+					const itemExists = Object.values(cartData).some(
+						(item) => item.productId === product.id
+					);
+
+					if (itemExists) {
+						toast("Item already exists in the cart.", {
+							className: "toastify-style",
+							toastId: "itemExist",
+						});
+					} else {
+						// Add the new item to the cart
+						const newItemIndex = Object.keys(cartData).length;
+						const newItemRef = ref(
+							db,
+							`carts/${userId}/${newItemIndex}`
+						);
+						set(newItemRef, {
+							productId: product.id,
+							name: product.name,
+							qty: 1,
+						})
+							.then(() => {
+								toast("Item is added to cart successfully.", {
+									className: "toastify-style",
+									toastId: "success-add-cart",
+								});
+							})
+							.catch((error) => {
+								console.error(
+									"Error adding item to cart:",
+									error
+								);
+							});
+					}
+				} else {
+					const newItemRef = ref(db, `carts/${userId}/0`);
+					set(newItemRef, {
+						productId: product.id,
+						name: product.name,
+						qty: 1,
+					})
+						.then(() => {
+							toast("Item is added to cart successfully.", {
+								className: "toastify-style",
+								toastId: "success-add-cart",
+							});
+						})
+						.catch((error) => {
+							console.error("Error adding item to cart:", error);
+						});
+				}
+			});
+		}
+
+		function createCartAndAddProduct(userId, item) {
+			set(ref(db, `carts/${userId}/0`), {
+				productId: item.id,
+				name: item.name,
+				qty: 1,
+			})
+				.then(() => {
+					console.log("Cart created and item added successfully");
+				})
+				.catch((error) => {
+					console.error(
+						"Error creating cart and adding item:",
+						error
+					);
+				});
+		}
 	};
 
-	function updateCart() {
-		let cartLocalData = JSON.parse(localStorage.getItem("cart")) || [];
-		let countlocal = Object.keys(cartLocalData).length;
-		setCount(countlocal);
-	}
+	const buyNow = (e, id, price) => {
+		e.preventDefault();
+
+		let token = localStorage.getItem("token");
+
+		if (token) {
+			const db = getDatabase(app);
+			const auth = getAuth();
+
+			onAuthStateChanged(auth, (user) => {
+				const userId = user.uid;
+				const cartRef = ref(db, `carts/${userId}`);
+				get(cartRef).then((snapshot) => {
+					if (snapshot.exists()) {
+						let data = snapshot.val();
+						let product = data.filter(
+							(product) => product.productId != id
+						);
+						setCount(product.length);
+
+						var options = {
+							key: "rzp_test_DOm6ar0I9tgeVk",
+							key_secret: "QBkJ4Hn1dQUO4eVfhn55igmO",
+							amount: parseInt(price * 100),
+							currency: "INR",
+							name: "Amazona",
+							description: "for testing purpose",
+							handler: function (response) {
+								console.log(response);
+								toast("Payment Successful", {
+									className: "toastify-style",
+									toastId: "success",
+								});
+							},
+
+							theme: {
+								color: "#0f172a",
+							},
+							modal: {
+								backdropclose: false,
+								ondismiss: function () {
+									console.log("Payment modal closed");
+								},
+							},
+						};
+
+						var pay = new window.Razorpay(options);
+						pay.open();
+
+						set(cartRef, product)
+							.then(() => console.log("product remove from cart"))
+							.catch((err) => console.log(err));
+					}
+				});
+			});
+		} else {
+			if (!toast.isActive("login-check")) {
+				toast("You are not logged in", {
+					className: "toastify-style",
+					toastId: "login-check",
+				});
+			}
+		}
+
+		const db = getDatabase(app);
+		const auth = getAuth();
+	};
 
 	return (
 		<>
+			<ToastContainer />
 			<div>
 				<Header cartCount={count} />
-				<section>
+				<section className='bg-slate-950'>
 					<div>
-						<div className='flex py-12 justify-center mt-20'>
+						<div className='flex flex-col items-center gap-5 md:flex lg:flex-row lg:gap-12  lg:justify-center pt-24 py-12'>
 							<div>
 								<img
-									className='h-[410px] w-[410px] mr-12 object-cover'
+									className='w-[90%] m-auto lg:h-[410px] lg:w-[410px]  lg:object-cover rounded-3xl'
 									src={data.image}
 									alt={data.name}
 								/>
 							</div>
-							<div>
-								<div className='capitalize text-4xl font-semibold'>
+							<div className='flex flex-col justify-between gap-1 p-4'>
+								<div className='capitalize text-4xl font-medium'>
 									{data.name}
 								</div>
-								<div className='w-96 text-justify block'>
-									<div className='text-xl font-medium '>
-										About:
-									</div>
-									<span className='font-normal'>
+								<div className=' lg:w-96 lg:text-justify block'>
+									<span className='text-base'>
 										{data.description.substring(0, 200)}
 									</span>
-									<hr className='my-3 border-1' />
+								</div>
+								<hr className='my-3 border-1' />
+								<div>
 									<div className='flex'>
 										<span className='text-3xl'>
 											₹{data.price}
@@ -250,19 +411,19 @@ function ProductDetails() {
 									<div className='justify-start'>
 										<div className='text-slate-400 text-sm	'>
 											{data.shipping && (
-												<div className=' font-medium '>
+												<div className=' font-medium p-1'>
 													Free Delivery
 												</div>
 											)}
 										</div>
 										<div className='text-slate-400 text-sm flex 	gap-1'>
-											<span className='font-medium'>
-												Category:
-											</span>
 											<div className='flex gap-1 flex-wrap capitalize'>
 												{data.category.map(
 													(category, index) => (
-														<span key={index}>
+														<span
+															key={index}
+															className='text-sm mr-1 bg-slate-800 rounded px-[3px]'
+														>
 															{category}
 														</span>
 													)
@@ -272,22 +433,31 @@ function ProductDetails() {
 									</div>
 									<hr className='my-3 border-1' />
 									<div className='flex justify-between mt-1'>
-										<button className='  h-12 w-48 border rounded-md border-red-500 bg-red-500 text-white hover:bg-red-600 hover:border-red-600'>
+										<button
+											className='h-12  w-40 inline rounded p-2 text-center bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600 text-white font-semibold  shadow-color'
+											onClick={(e) =>
+												buyNow(e, data.id, data.price)
+											}
+										>
 											Buy Now
 										</button>
-										<button
-											className='flex h-12 border border-1 rounded-md border-slate-500 w-40 hover:border-black'
-											onClick={(e) => addToCart(e)}
-										>
-											<img
-												src={Trolly}
-												alt='trolly'
-												className='h-7 w-7 m-2'
-											/>
-											<span className='m-2 pt-1 font-semibold text-slate-300 '>
-												Add to Cart
-											</span>
-										</button>
+										<div className='rounded bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-800 p-[2px] '>
+											<button
+												className='flex h-12 w-40  rounded bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-800 '
+												onClick={(e) =>
+													addToCart(e, data)
+												}
+											>
+												<img
+													src={Trolly}
+													alt='trolly'
+													className='h-7 w-7 m-2'
+												/>
+												<span className='m-2 pt-1 font-semibold text-slate-300 '>
+													Add to Cart
+												</span>
+											</button>
+										</div>
 									</div>
 								</div>
 							</div>
