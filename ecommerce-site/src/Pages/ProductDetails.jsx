@@ -69,7 +69,8 @@ function ProductDetails() {
 				if (snapshot.exists()) {
 					const cartData = snapshot.val();
 					const numberOfItems = Object.keys(cartData).length;
-					setCount(numberOfItems);
+					console.log("cart data length:", cartData.length);
+					setCount(cartData.length);
 				}
 
 				if (cartData) {

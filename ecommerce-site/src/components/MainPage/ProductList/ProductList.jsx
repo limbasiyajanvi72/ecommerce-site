@@ -228,66 +228,88 @@ function ProductList({ updateCartCount }) {
 	const handleAddCart = async (e, item, index) => {
 		e.preventDefault();
 		let loginStatus = localStorage.getItem("token");
-		{
-			!loginStatus &&
-				toast("First login", {
-					className: "toastify-style",
-					toastId: "checkedLogin",
-				});
-		}
+		if (!loginStatus) {
+			toast("You are not logged in", {
+				className: "toastify-style",
+				toastId: "checkedLogin",
+			});
+		} else {
+			const db = getDatabase(app);
+			const auth = getAuth();
 
-		const db = getDatabase(app);
-		const auth = getAuth();
+			onAuthStateChanged(auth, (user) => {
+				if (user) {
+					const userId = user.uid;
+					const cartRef = ref(db, `carts/${userId}`);
 
-		onAuthStateChanged(auth, (user) => {
-			if (user) {
-				const userId = user.uid;
+					get(cartRef)
+						.then((snapshot) => {
+							if (snapshot.exists()) {
+								addProductToCart(userId, item);
+							} else {
+								createCartAndAddProduct(userId, item);
+							}
+						})
+						.catch((error) => {
+							console.error("Error checking user's cart:", error);
+						});
+				} else {
+					console.log("User is not signed in");
+				}
+			});
+
+			function addProductToCart(userId, product) {
 				const cartRef = ref(db, `carts/${userId}`);
 
-				get(cartRef)
-					.then((snapshot) => {
-						if (snapshot.exists()) {
-							addProductToCart(userId, item);
-						} else {
-							createCartAndAddProduct(userId, item);
-						}
-					})
-					.catch((error) => {
-						console.error("Error checking user's cart:", error);
-					});
-			} else {
-				console.log("User is not signed in");
-			}
-		});
-
-		function addProductToCart(userId, product) {
-			const cartRef = ref(db, `carts/${userId}`);
-
-			get(cartRef).then((snapshot) => {
-				const cartData = snapshot.val();
-				if (snapshot.exists()) {
+				get(cartRef).then((snapshot) => {
 					const cartData = snapshot.val();
-					const numberOfItems = Object.keys(cartData).length;
-					updateCartCount(numberOfItems);
-				}
+					console.log("cart data:", cartData);
+					if (snapshot.exists()) {
+						const cartData = snapshot.val();
+						const numberOfItems = Object.keys(cartData).length;
+						updateCartCount(numberOfItems);
+					}
 
-				if (cartData) {
-					const itemExists = Object.values(cartData).some(
-						(item) => item.productId === product.id
-					);
-
-					if (itemExists) {
-						toast("Item already exists in the cart.", {
-							className: "toastify-style",
-							toastId: "itemExist",
-						});
-					} else {
-						// Add the new item to the cart
-						const newItemIndex = Object.keys(cartData).length;
-						const newItemRef = ref(
-							db,
-							`carts/${userId}/${newItemIndex}`
+					if (cartData) {
+						const itemExists = Object.values(cartData).some(
+							(item) => item.productId === product.id
 						);
+
+						if (itemExists) {
+							toast("Item already exists in the cart.", {
+								className: "toastify-style",
+								toastId: "itemExist",
+							});
+						} else {
+							// Add the new item to the cart
+							const newItemIndex = Object.keys(cartData).length;
+							const newItemRef = ref(
+								db,
+								`carts/${userId}/${newItemIndex}`
+							);
+							set(newItemRef, {
+								productId: product.id,
+								name: product.name,
+								qty: 1,
+							})
+								.then(() => {
+									toast(
+										"Item is added to cart successfully.",
+										{
+											className: "toastify-style",
+											toastId: "success-add-cart",
+										}
+									);
+								})
+								.catch((error) => {
+									console.error(
+										"Error adding item to cart:",
+										error
+									);
+								});
+						}
+					} else {
+						const newItemRef = ref(db, `carts/${userId}/0`);
 						set(newItemRef, {
 							productId: product.id,
 							name: product.name,
@@ -306,41 +328,25 @@ function ProductList({ updateCartCount }) {
 								);
 							});
 					}
-				} else {
-					const newItemRef = ref(db, `carts/${userId}/0`);
-					set(newItemRef, {
-						productId: product.id,
-						name: product.name,
-						qty: 1,
-					})
-						.then(() => {
-							toast("Item is added to cart successfully.", {
-								className: "toastify-style",
-								toastId: "success-add-cart",
-							});
-						})
-						.catch((error) => {
-							console.error("Error adding item to cart:", error);
-						});
-				}
-			});
-		}
-
-		function createCartAndAddProduct(userId, item) {
-			set(ref(db, `carts/${userId}/0`), {
-				productId: item.id,
-				name: item.name,
-				qty: 1,
-			})
-				.then(() => {
-					console.log("Cart created and item added successfully");
-				})
-				.catch((error) => {
-					console.error(
-						"Error creating cart and adding item:",
-						error
-					);
 				});
+			}
+
+			function createCartAndAddProduct(userId, item) {
+				set(ref(db, `carts/${userId}/0`), {
+					productId: item.id,
+					name: item.name,
+					qty: 1,
+				})
+					.then(() => {
+						console.log("Cart created and item added successfully");
+					})
+					.catch((error) => {
+						console.error(
+							"Error creating cart and adding item:",
+							error
+						);
+					});
+			}
 		}
 	};
 	const showProductDetails = (item, id, e) => {
